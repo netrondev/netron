@@ -1,3 +1,3 @@
-/src
-/public
-/Cargo.toml
+# Ignore everything but the backend crate
+*
+!/src-tauri/*

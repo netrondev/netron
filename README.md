@@ -1,1 +1,1 @@
-cargo tauri dev
+run `cargo tauri dev` and `cargo leptos watch` to see the app in the browser and app.

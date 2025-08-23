@@ -2,6 +2,32 @@
 resolver = "2"
 members = ["src-tauri", "frontend", "backend", "app", "server"]
 
+[workspace.dependencies]
+leptos_meta = { git = "https://github.com/rvdende/leptos", branch = "css_hydration" }
+leptos_axum = { git = "https://github.com/rvdende/leptos", branch = "css_hydration" }
+leptos = { git = "https://github.com/rvdende/leptos", branch = "css_hydration" }
+leptos-use = { version = "0.16.2" }
+leptos_router = { git = "https://github.com/rvdende/leptos", branch = "css_hydration", features = [
+    "nightly",
+] }
+server_fn = { git = "https://github.com/rvdende/leptos", branch = "css_hydration" }
+# Serialization
+serde = { version = "1.0", default-features = false, features = [
+    "derive",
+    "std",
+] }
+serde_json = { version = "1.0.140", default-features = false, features = [
+    "std",
+] }
+serde_urlencoded = "0.7.1"
+
+[patch.crates-io]
+leptos = { git = "https://github.com/rvdende/leptos", branch = "css_hydration" }
+leptos_meta = { git = "https://github.com/rvdende/leptos", branch = "css_hydration" }
+leptos_router = { git = "https://github.com/rvdende/leptos", branch = "css_hydration" }
+leptos_axum = { git = "https://github.com/rvdende/leptos", branch = "css_hydration" }
+server_fn = { git = "https://github.com/rvdende/leptos", branch = "css_hydration" }
+
 [profile.release]
 codegen-units = 1
 lto = true

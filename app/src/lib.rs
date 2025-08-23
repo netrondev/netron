@@ -1,13 +1,13 @@
 use backend::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, Stylesheet};
 
 #[component]
 pub fn App() -> impl IntoView {
     provide_meta_context();
-    let action = create_server_action::<HelloWorldServer>();
-    let vals = create_rw_signal(String::new());
-    create_effect(move |_| {
+    let action = ServerAction::<HelloWorldServer>::new();
+    let vals = RwSignal::new(String::new());
+    Effect::new(move |_| {
         if let Some(resp) = action.value().get() {
             match resp {
                 Ok(val) => vals.set(val),

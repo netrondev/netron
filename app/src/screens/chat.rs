@@ -1,6 +1,6 @@
 use backend::*;
 use leptos::ev::SubmitEvent;
-use leptos::*;
+use leptos::prelude::*;
 
 #[component]
 pub fn ChatScreen() -> impl IntoView {

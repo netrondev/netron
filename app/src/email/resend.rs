@@ -18,7 +18,7 @@ use resend_rs::{
 use serde::{Deserialize, Serialize};
 
 #[cfg(not(feature = "ssr"))]
-use linum_core::{Datetime, RecordId};
+use crate::{Datetime, RecordId};
 
 #[cfg(feature = "ssr")]
 use surrealdb::{Datetime, RecordId};
@@ -145,7 +145,7 @@ async fn resend_email_test() -> Result<(), AppError> {
 
     let result = resend
         .send_email(
-            "rouan@linumlabs.dev".into(),
+            "noreply@localhost".into(),
             "Test Email",
             "<h1>Hello World</h1><p>This is a test email.</p>",
         )

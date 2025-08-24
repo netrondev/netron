@@ -12,11 +12,36 @@ backend = { path = "../backend" }
 leptos = { workspace = true }
 tracing = "0.1"
 leptos_router = { workspace = true }
-
+leptos_axum = { workspace = true }
+serde = { workspace = true }
+tw_merge = { workspace = true }
+phosphor-leptos = { workspace = true }
+web-sys = { workspace = true }
+wasm-bindgen = { workspace = true }
+serde_json = { workspace = true }
+partial_struct = { workspace = true }
+surrealdb = { workspace = true  }
+chrono = { workspace = true  }
+urlencoding = { workspace = true }
+time = { workspace = true  }
+regex = { workspace = true  }
+bytes = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+resend-rs = { workspace = true, optional = true }
+dotenvy = { workspace = true }
+axum = { workspace = true }
+axum-extra = { workspace = true }
+hex = { workspace = true }
+http = { workspace = true }
+leptos-use = { workspace = true }
+reqwest = { workspace = true }
+uuid = { workspace = true }
+base64 = { workspace = true }
+rand = { workspace = true }
 [features]
 csr = ["leptos/csr"]
 hydrate = [
   "leptos/hydrate",
   "backend/hydrate",
 ]
-ssr = ["leptos/ssr", "leptos_meta/ssr", "backend/ssr", "leptos_router/ssr"]
+ssr = ["leptos/ssr", "leptos_meta/ssr", "backend/ssr", "leptos_router/ssr", "bytes", "tokio", "resend-rs"]

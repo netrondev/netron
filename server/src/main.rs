@@ -59,6 +59,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 <AutoReload options=options.clone() />
                 <HydrationScripts options />
                 <MetaTags />
+                <title>"test"</title>
             </head>
             <body>
                 <App />

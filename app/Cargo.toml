@@ -7,41 +7,71 @@ edition = "2021"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [dependencies]
-leptos_meta = { workspace = true }
-backend = { path = "../backend" }
-leptos = { workspace = true }
-tracing = "0.1"
-leptos_router = { workspace = true }
-leptos_axum = { workspace = true }
-serde = { workspace = true }
-tw_merge = { workspace = true }
-phosphor-leptos = { workspace = true }
-web-sys = { workspace = true }
-wasm-bindgen = { workspace = true }
-serde_json = { workspace = true }
-partial_struct = { workspace = true }
-surrealdb = { workspace = true  }
-chrono = { workspace = true  }
-urlencoding = { workspace = true }
-time = { workspace = true  }
-regex = { workspace = true  }
+leptos_meta = { workspace = true, optional = true }
+backend = { path = "../backend", optional = true }
+leptos = { workspace = true, optional = true }
+tracing = { version = "0.1", optional = true }
+leptos_router = { workspace = true, optional = true }
+leptos_axum = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+tw_merge = { workspace = true, optional = true }
+phosphor-leptos = { workspace = true, optional = true }
+web-sys = { workspace = true, optional = true }
+wasm-bindgen = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+partial_struct = { workspace = true, optional = true }
+surrealdb = { workspace = true, optional = true }
+chrono = { workspace = true, optional = true }
+urlencoding = { workspace = true, optional = true }
+time = { workspace = true, optional = true }
+regex = { workspace = true, optional = true }
 bytes = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
 resend-rs = { workspace = true, optional = true }
-dotenvy = { workspace = true }
-axum = { workspace = true }
-axum-extra = { workspace = true }
-hex = { workspace = true }
-http = { workspace = true }
-leptos-use = { workspace = true }
-reqwest = { workspace = true }
-uuid = { workspace = true }
-base64 = { workspace = true }
-rand = { workspace = true }
+dotenvy = { workspace = true, optional = true }
+axum = { workspace = true, optional = true }
+axum-extra = { workspace = true, optional = true }
+hex = { workspace = true, optional = true }
+http = { workspace = true, optional = true }
+leptos-use = { workspace = true, optional = true }
+reqwest = { workspace = true, optional = true }
+uuid = { workspace = true, optional = true }
+base64 = { workspace = true, optional = true }
+rand = { workspace = true, optional = true }
+
 [features]
 csr = ["leptos/csr"]
-hydrate = [
-  "leptos/hydrate",
-  "backend/hydrate",
+hydrate = ["leptos/hydrate", "backend/hydrate"]
+ssr = [
+  "leptos/ssr",
+  "leptos_meta/ssr",
+  "backend/ssr",
+  "leptos_router/ssr",
+  "leptos_axum",
+  "tracing",
+  "serde",
+  "tw_merge",
+  "phosphor-leptos",
+  "web-sys",
+  "wasm-bindgen",
+  "serde_json",
+  "partial_struct",
+  "surrealdb",
+  "chrono",
+  "urlencoding",
+  "time",
+  "regex",
+  "bytes",
+  "tokio",
+  "resend-rs",
+  "dotenvy",
+  "axum",
+  "axum-extra",
+  "hex",
+  "http",
+  "leptos-use",
+  "reqwest",
+  "uuid",
+  "base64",
+  "rand",
 ]
-ssr = ["leptos/ssr", "leptos_meta/ssr", "backend/ssr", "leptos_router/ssr", "bytes", "tokio", "resend-rs"]

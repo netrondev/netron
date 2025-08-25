@@ -6277,6 +6277,7 @@ dependencies = [
  "backend",
  "leptos",
  "leptos_axum",
+ "leptos_meta",
  "leptos_router",
  "opentelemetry",
  "opentelemetry-otlp",

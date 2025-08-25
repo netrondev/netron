@@ -5,3 +5,6 @@ dist
 src-tauri/gen/
 .idea
 .DS_Store
+dbdata
+.env*
+!.env.sample

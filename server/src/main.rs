@@ -4,6 +4,7 @@ use axum::{extract::OriginalUri, http::Request, Router};
 use backend::fallback::file_and_error_handler;
 use leptos::prelude::*;
 use leptos_axum::LeptosRoutes;
+use leptos_meta::MetaTags;
 
 use std::net::SocketAddr;
 use tower_http::{
@@ -57,7 +58,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
                 </style>
                 <AutoReload options=options.clone() />
                 <HydrationScripts options />
-                // <MetaTags />
+                <MetaTags />
             </head>
             <body>
                 <App />

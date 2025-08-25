@@ -21,7 +21,15 @@ pub mod navbar;
 pub mod theme;
 pub use apperror::AppError;
 pub mod db;
+pub mod surrealtypes;
+#[cfg(feature = "ssr")]
 pub use db::db_init;
+
+#[cfg(feature = "ssr")]
+pub use surrealdb::{Datetime, RecordId};
+
+#[cfg(not(feature = "ssr"))]
+pub use crate::surrealtypes::{Datetime, RecordId};
 
 #[component]
 pub fn App() -> impl IntoView {

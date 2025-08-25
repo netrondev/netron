@@ -41,7 +41,25 @@ rand = { workspace = true, optional = true }
 
 [features]
 csr = ["leptos/csr"]
-hydrate = ["leptos/hydrate", "backend/hydrate"]
+hydrate = [
+  "leptos/hydrate",
+  "backend/hydrate",
+  "leptos_meta",
+  "leptos_router",
+  "phosphor-leptos",
+  "urlencoding",
+  "serde",
+  "chrono",
+  "tw_merge",
+  "web-sys",
+  "wasm-bindgen",
+  "serde_json",
+  "partial_struct",
+  "time",
+  "leptos-use",
+  "reqwest",
+  "regex",
+]
 ssr = [
   "leptos/ssr",
   "leptos_meta/ssr",

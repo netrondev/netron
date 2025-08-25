@@ -11,6 +11,7 @@ impl EmailAddress {
     }
 
     // Email validation
+    // #[cfg(feature = "ssr")]
     pub fn validate_email(&self) -> bool {
         let email_regex = regex::Regex::new(r"^[^\s@]+@[^\s@]+\.[^\s@]+$").unwrap();
         email_regex.is_match(&self.0)

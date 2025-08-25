@@ -16,10 +16,6 @@ use crate::AppError;
 #[cfg(feature = "ssr")]
 use chrono::Utc;
 
-#[cfg(feature = "ssr")]
-use surrealdb::{Datetime, RecordId};
-
-#[cfg(not(feature = "ssr"))]
 use crate::{Datetime, RecordId};
 
 use crate::theme::Theme;

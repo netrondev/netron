@@ -7,16 +7,20 @@ edition = "2021"
 [dependencies]
 app = { path = "../app", features = ["ssr"] }
 backend = { path = "../backend", features = ["ssr"] }
+
 axum = { version = "0.8" }
 axum-macros = { version = "0.4.1" }
 leptos = { workspace = true }
 leptos_axum = { workspace = true }
+leptos_meta = { workspace = true }
 leptos_router = { workspace = true }
 tokio = { version = "1.35.1", features = ["rt-multi-thread"] }
 tower-http = { version = "0.6", features = ["fs", "cors", "trace"] }
+
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-opentelemetry = { version = "0.23", default-features = true }
+
 opentelemetry = { version = "0.22.0", features = ["trace", "metrics"] }
 opentelemetry_sdk = { version = "0.22.0", default-features = false, features = [
   "trace",

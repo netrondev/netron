@@ -1,26 +1,32 @@
 use crate::{
-    colors::Color,
     components::{
         button::ButtonIcon,
         sidebar::{NavBarLink, SideBar, SidebarItem},
     },
     navbar::Navbar,
+    screens::{ChatScreen, HomeScreen},
     theme::ThemeProvider,
 };
 use backend::*;
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, Stylesheet};
-use leptos_router::components::Router;
-use phosphor_leptos::{CHART_LINE_UP, CURRENCY_ETH, GEAR, WALLET};
+use leptos_router::{
+    components::{Route, Router, Routes},
+    path,
+};
+use phosphor_leptos::{CUBE, CURRENCY_ETH, GEAR, PLANET, WALLET};
 pub mod apperror;
 pub mod auth;
+pub mod chat;
 pub mod colors;
 pub mod components;
+pub mod date_utils;
 pub mod email;
 pub mod navbar;
 pub mod theme;
 pub use apperror::AppError;
 pub mod db;
+pub mod screens;
 pub mod surrealtypes;
 #[cfg(feature = "ssr")]
 pub use db::db_init;
@@ -35,25 +41,16 @@ pub use crate::surrealtypes::{Datetime, RecordId};
 pub fn App() -> impl IntoView {
     let links = vec![
         SidebarItem::Link(NavBarLink {
-            name: "Trading".to_string(),
-            icon: ButtonIcon::Icon(CHART_LINE_UP),
+            name: "Dashboard".to_string(),
+            icon: ButtonIcon::Icon(CUBE),
             icon_hover: None,
-            background_color: Color::from_tailwind("amber-600"),
-            url: "/trading".to_string(),
+            url: "/".to_string(),
         }),
         SidebarItem::Link(NavBarLink {
-            name: "EVM".to_string(),
-            icon: ButtonIcon::Icon(CURRENCY_ETH),
+            name: "Global".to_string(),
+            icon: ButtonIcon::Icon(PLANET),
             icon_hover: None,
-            background_color: Color::from_tailwind("cyan-600"),
-            url: "/evm".to_string(),
-        }),
-        SidebarItem::Link(NavBarLink {
-            name: "Wallets".to_string(),
-            icon: ButtonIcon::Icon(WALLET),
-            icon_hover: None,
-            background_color: Color::from_tailwind("purple-600"),
-            url: "/wallets".to_string(),
+            url: "/global".to_string(),
         }),
         SidebarItem::Gap,
         SidebarItem::Divider,
@@ -61,7 +58,6 @@ pub fn App() -> impl IntoView {
             name: "Settings".to_string(),
             icon: ButtonIcon::Icon(GEAR),
             icon_hover: None,
-            background_color: Color::from_tailwind("teal-600"),
             url: "/settings".to_string(),
         }),
     ];
@@ -90,7 +86,12 @@ pub fn App() -> impl IntoView {
                                 </div>
                                 <div class="flex-1 flex flex-row min-h-0 w-full">
                                     <div class="flex flex-col w-full">
-                                        <span>"Router pages here"</span>
+
+                                         <Routes fallback=|| "Page not found.".into_view()>
+                                            <Route path=path!("/") view=HomeScreen />
+                                            <Route path=path!("/global") view=ChatScreen />
+
+                                        </Routes>
                                     </div>
                                 </div>
                             </div>

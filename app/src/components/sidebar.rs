@@ -11,7 +11,6 @@ pub struct NavBarLink {
     pub name: String,
     pub icon: ButtonIcon,
     pub icon_hover: Option<ButtonIcon>,
-    pub background_color: crate::colors::Color,
     pub url: String,
 }
 

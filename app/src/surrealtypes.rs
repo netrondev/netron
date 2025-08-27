@@ -45,6 +45,10 @@ impl RecordId {
     pub fn from_table_and_id(table: &str, id: String) -> Self {
         Self::from_table_key(table, &id)
     }
+
+    pub fn from(value: (&str, &str)) -> Self {
+        Self::from_table_key(value.0, value.1)
+    }
 }
 
 impl From<String> for RecordId {

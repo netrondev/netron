@@ -1,4 +1,3 @@
-use crate::tracing_setup::*;
 use app::App;
 use axum::{extract::OriginalUri, http::Request, Router};
 use backend::fallback::file_and_error_handler;
@@ -12,7 +11,6 @@ use tower_http::{
     trace::TraceLayer,
 };
 use tracing::info_span;
-use tracing_opentelemetry::{MetricsLayer, OpenTelemetryLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[derive(Clone, Debug, axum_macros::FromRef)]
@@ -20,7 +18,6 @@ pub struct ServerState {
     pub options: LeptosOptions,
     pub routes: Vec<leptos_axum::AxumRouteListing>,
 }
-pub mod tracing_setup;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -71,23 +68,16 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 #[tokio::main]
 async fn main() {
     let conf = get_configuration(Some("./Cargo.toml")).unwrap();
-
     let addr = conf.leptos_options.site_addr;
     let leptos_options = conf.leptos_options;
-
-    let meter_provider = init_meter_provider();
-
     let routes = leptos_axum::generate_route_list(App);
 
     tracing_subscriber::registry()
 		.with(tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
 			"app=debug,frontend=debug,backend=debug,server=debug,tower_http=debug,axum::rejection=trace".into()
 		}))
-		.with(MetricsLayer::new(meter_provider.clone()))
-		.with(OpenTelemetryLayer::new(init_tracer()))
 		.with(tracing_subscriber::fmt::layer())
 		.init();
-    //OtelGuard { meter_provider };
 
     let _state = ServerState {
         options: leptos_options.clone(),

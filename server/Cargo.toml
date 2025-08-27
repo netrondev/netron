@@ -19,13 +19,3 @@ tower-http = { version = "0.6", features = ["fs", "cors", "trace"] }
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-tracing-opentelemetry = { version = "0.23", default-features = true }
-
-opentelemetry = { version = "0.22.0", features = ["trace", "metrics"] }
-opentelemetry_sdk = { version = "0.22.0", default-features = false, features = [
-  "trace",
-  "rt-tokio",
-] }
-opentelemetry-semantic-conventions = "0.14.0"
-opentelemetry-otlp = { version = "0.15.0", features = ["metrics"] }
-opentelemetry-stdout = { version = "0.3.0", features = ["trace", "metrics"] }

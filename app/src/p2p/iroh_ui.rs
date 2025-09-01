@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-use crate::components::Input;
+use crate::components::{label::Label, Input};
 
 #[component]
 pub fn IrohTest() -> impl IntoView {
@@ -8,8 +8,9 @@ pub fn IrohTest() -> impl IntoView {
 
     // Your component implementation here
     view! {
-        <div>"Iroh test 1234"
+        <div>
 
+            <Label title="Username">
                <Input
                     placeholder="Search for tokens..."
                     class="w-full"
@@ -18,6 +19,7 @@ pub fn IrohTest() -> impl IntoView {
                         username.set(val);
                     })
                 />
+            </Label>
 
         </div>
     }

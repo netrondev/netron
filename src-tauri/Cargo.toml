@@ -3,6 +3,13 @@ name = "src_tauri"
 version = "0.0.1"
 edition = "2021"
 
+# Use workspace profiles
+[profile.dev]
+# Inherits from workspace
+
+[profile.fast-dev]
+# Inherits from workspace
+
 [lib]
 name = "app_lib"
 path = "src/lib.rs"

@@ -52,5 +52,6 @@ pub mod navigation_back_button;
 pub use navigation_back_button::NavigationBackButton;
 pub use tabs::{TabButton, TabNavGroup};
 pub mod image_upload;
+pub mod label;
 pub mod page_error_404;
 pub mod progress_bar;

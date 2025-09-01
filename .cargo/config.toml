@@ -1,0 +1,23 @@
+[env]
+# Use the fast-dev profile for Tauri development builds
+CARGO_PROFILE_DEV_OPT_LEVEL = "0"
+CARGO_PROFILE_DEV_LTO = "false"
+CARGO_PROFILE_DEV_CODEGEN_UNITS = "256"
+CARGO_PROFILE_DEV_DEBUG = "1"
+
+[build]
+# Use lld linker for faster linking (if available)
+# Uncomment the appropriate line for your platform:
+# Linux:
+# rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+# macOS:
+# rustflags = ["-C", "link-arg=-fuse-ld=/usr/local/opt/llvm/bin/ld64.lld"]
+# Windows:
+# rustflags = ["-C", "link-arg=-fuse-ld=lld-link"]
+
+# Faster incremental compilation
+incremental = true
+
+# Use the fast-dev profile for tauri dev command
+[alias]
+tauri-fast = "tauri --profile fast-dev"

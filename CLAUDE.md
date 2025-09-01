@@ -25,14 +25,20 @@ surreal start --user root --pass root --bind 0.0.0.0:8100 surrealkv://dbdata
 ### Web Development
 ```bash
 # Run both the Leptos server and watch for changes (two terminals)
-cargo leptos watch  # Terminal 1: Builds and watches frontend
+cargo leptos watch  # Terminal 1: Builds and watches frontend (uses fast-dev profile by default)
 cargo leptos serve  # Terminal 2: Runs the server at http://localhost:8000
+
+# Note: The fast-dev profile is configured by default in Cargo.toml for rapid iteration
+# To use standard dev profile (slower but more optimized), comment out lib-profile and bin-profile in Cargo.toml
 ```
 
 ### Desktop Development (Tauri)
 ```bash
-# Run the desktop app with hot reload
+# Run the desktop app with hot reload (uses fast compilation settings via .cargo/config.toml)
 cargo tauri dev
+
+# Alternative: explicitly use fast-dev profile
+CARGO_PROFILE=fast-dev cargo tauri dev
 ```
 
 ### Build Commands

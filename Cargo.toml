@@ -126,11 +126,23 @@ codegen-units = 1
 lto = true
 
 [profile.dev]
-lto = true
-opt-level = 1
+lto = false
+opt-level = 0
+debug = 1  # Reduce debug info for faster compilation
 
 [profile.dev.package."*"]
-opt-level = 3
+opt-level = 2
+
+# Fast development profile for quick iteration
+[profile.fast-dev]
+inherits = "dev"
+opt-level = 0
+lto = false
+codegen-units = 256
+incremental = true
+
+[profile.fast-dev.package."*"]
+opt-level = 1  # Minimal optimization for deps to keep them reasonably fast
 
 [[workspace.metadata.leptos]]
 # project name
@@ -151,3 +163,7 @@ bin-features = []
 bin-default-features = false
 lib-features = ["hydrate"]
 lib-default-features = false
+# Use fast-dev profile for lib (WASM) compilation
+lib-profile = "fast-dev"
+# Use fast-dev profile for bin (server) compilation  
+bin-profile = "fast-dev"

@@ -24,21 +24,14 @@ pub enum AppError {
     Reqwest(String),
     MultipartError(String),
     ErrorReason(String),
-    ResendError(String),
     AuthError(String),
     DatabaseError(String),
     EnvVarError(String),
     NotFound(String),
-
-    // #[error("Provider error: {0}")]
     Provider(String),
-    // #[error("Invalid address: {0}")]
     InvalidAddress(String),
-    // #[error("Configuration error: {0}")]
     Config(String),
-
     DeserializationError(String),
-
     ServerFnError(ServerFnErrorErr),
 }
 
@@ -154,13 +147,7 @@ impl axum::response::IntoResponse for AppError {
                     "File upload error".to_string(),
                 )
             }
-            AppError::ResendError(msg) => {
-                tracing::error!(error = %msg, "Email service error");
-                (
-                    axum::http::StatusCode::BAD_GATEWAY,
-                    "Email service error".to_string(),
-                )
-            }
+
             AppError::AuthError(msg) => {
                 tracing::warn!(error = %msg, "Authentication error");
                 (
@@ -280,7 +267,6 @@ impl Display for AppError {
             AppError::Reqwest(msg) => write!(f, "Reqwest error: {}", msg),
             AppError::MultipartError(msg) => write!(f, "Multipart error: {}", msg),
             AppError::ErrorReason(msg) => write!(f, "Error reason: {}", msg),
-            AppError::ResendError(msg) => write!(f, "Resend error: {}", msg),
             AppError::AuthError(msg) => write!(f, "Authentication error: {}", msg),
             AppError::DatabaseError(msg) => write!(f, "Database error: {}", msg),
             AppError::EnvVarError(msg) => write!(f, "Environment variable error: {}", msg),
@@ -345,6 +331,16 @@ impl From<serde_json::Error> for AppError {
     }
 }
 
+#[cfg(feature = "ssr")]
+impl From<anyhow::Error> for AppError {
+    fn from(error: anyhow::Error) -> Self {
+        #[cfg(feature = "ssr")]
+        tracing::error!(error = %error, "Anyhow error");
+
+        Self::GenericError(format!("{error}"))
+    }
+}
+
 /// This will help print out the offending part of the JSON that caused the deserialization error.
 ///
 /// ### EXAMPLE:
@@ -374,13 +370,6 @@ pub fn serde_detail_error(e: &serde_json::Error, original: &str) -> AppError {
         ))
     } else {
         AppError::DeserializationError(format!("Deserialization error: {}", e.to_string()))
-    }
-}
-
-#[cfg(feature = "ssr")]
-impl From<resend_rs::Error> for AppError {
-    fn from(err: resend_rs::Error) -> Self {
-        AppError::ResendError(err.to_string())
     }
 }
 

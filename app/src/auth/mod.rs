@@ -1,6 +1,6 @@
 #[cfg(feature = "ssr")]
 pub mod adapter_rs_surreal;
-pub mod callback;
+
 pub mod ui_auth;
 
 pub mod user;

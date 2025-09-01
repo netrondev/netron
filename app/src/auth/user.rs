@@ -1,5 +1,3 @@
-use crate::email::EmailAddress;
-
 use partial_struct::Partial;
 use serde::{Deserialize, Serialize};
 
@@ -34,9 +32,7 @@ use crate::theme::Theme;
 pub struct AdapterUser {
     pub id: RecordId,
     pub name: String,
-    pub email_verified: Option<Datetime>,
     pub image: Option<String>,
-    pub email: EmailAddress,
     pub superadmin: Option<bool>,
     #[serde(default)]
     pub theme: Theme,
@@ -59,8 +55,6 @@ impl AdapterUser {
 
     pub async fn create_test_user() -> Result<Self, AppError> {
         let user = Self::create_user(CreateUserData {
-            email: EmailAddress::create_test_email(),
-            email_verified: None,
             name: "Test User".to_string(),
             image: None,
             theme: Theme::System,
@@ -90,29 +84,6 @@ impl AdapterUser {
             Some(user) => Ok(user),
             None => Err(AppError::AuthError("User not found".into())),
         }
-    }
-
-    pub async fn get_user_by_email(email: EmailAddress) -> Result<Self, AppError> {
-        let client = db_init().await?;
-
-        let mut result = client
-            .query("SELECT * FROM ONLY user WHERE email = $email LIMIT 1;")
-            .bind(("email", email))
-            .await?;
-
-        let user: Option<Self> = result.take(0)?;
-
-        match user {
-            Some(user) => Ok(user),
-            None => Err(AppError::AuthError("User not found".into())),
-        }
-    }
-
-    pub async fn get_by_email(email: String) -> Result<Self, AppError> {
-        use std::str::FromStr;
-        let email_address = EmailAddress::from_str(&email)
-            .map_err(|_| AppError::AuthError("Invalid email address".into()))?;
-        Self::get_user_by_email(email_address).await
     }
 
     pub async fn get_user_by_account(
@@ -179,10 +150,9 @@ impl AdapterUser {
         let db = db_init().await?;
 
         let mut query = db
-            .query("UPDATE $userid SET name = $name, email = $email, image = $image RETURN AFTER;")
+            .query("UPDATE $userid SET name = $name, image = $image RETURN AFTER;")
             .bind(("userid", data.id.clone()))
             .bind(("name", data.name))
-            .bind(("email", data.email.to_string()))
             .bind(("image", data.image))
             .await?;
 
@@ -224,17 +194,6 @@ impl AdapterUser {
         let _: Option<AdapterUser> = client.delete(&self.id).await?;
         // delete all related data?
         Ok(())
-    }
-
-    /// Creates a new verification token for the user.
-    pub async fn new_verification_token(&self) -> Result<VerificationToken, AppError> {
-        let token = VerificationToken::create_verification_token(CreateVerificationToken {
-            identifier: self.email.to_string(),
-            expires: Utc::now() + chrono::Duration::hours(1),
-        })
-        .await?;
-
-        Ok(token)
     }
 
     pub async fn new_session(&self) -> Result<AdapterSession, AppError> {

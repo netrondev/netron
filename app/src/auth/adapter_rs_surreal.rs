@@ -6,9 +6,6 @@ use crate::auth::{
     user::{AdapterUser, CreateUserData, UpdateUserData},
 };
 
-#[cfg(feature = "ssr")]
-use crate::email::EmailAddress;
-
 use crate::AppError;
 
 #[cfg(feature = "ssr")]
@@ -24,10 +21,6 @@ impl SurrealAdapter {
 
     pub async fn get_user(&self, id: RecordId) -> Result<AdapterUser, AppError> {
         Ok(AdapterUser::get_user(id).await?)
-    }
-
-    pub async fn get_user_by_email(&self, email: EmailAddress) -> Result<AdapterUser, AppError> {
-        Ok(AdapterUser::get_user_by_email(email).await?)
     }
 
     pub async fn get_user_by_account(
@@ -141,10 +134,10 @@ async fn test_adapter() -> Result<(), AppError> {
 
     let db = crate::db_init().await?;
 
-    let testemail = "example@test.com";
+    let testname = "test_user";
 
-    db.query("DELETE user WHERE email = $email;")
-        .bind(("email", testemail))
+    db.query("DELETE user WHERE name ~ $name;")
+        .bind(("name", testname))
         .await?;
 
     println!("Available in tests or when SSR feature is enabled");
@@ -152,9 +145,7 @@ async fn test_adapter() -> Result<(), AppError> {
     let adapter = SurrealAdapter {};
 
     let user_to_create = CreateUserData {
-        email: testemail.into(),
-        email_verified: None,
-        name: "Test User".to_string(),
+        name: testname.to_string(),
         image: None,
         theme: Theme::default(),
     };
@@ -168,48 +159,48 @@ async fn test_adapter() -> Result<(), AppError> {
         "Should not create user with same email"
     );
 
-    // test verification token
-    println!("creating new verification token");
-    let new_token = newuser.new_verification_token().await?;
+    // // test verification token
+    // println!("creating new verification token");
+    // let new_token = newuser.new_verification_token().await?;
 
-    println!("checking new token");
+    // println!("checking new token");
 
-    let check_token = VerificationToken::use_verification_token(
-        newuser.email.to_string(),
-        new_token.token.clone(),
-    )
-    .await?;
+    // let check_token = VerificationToken::use_verification_token(
+    //     newuser.email.to_string(),
+    //     new_token.token.clone(),
+    // )
+    // .await?;
 
-    // set verified email
-    let updated_user = newuser.set_verified_email().await?;
+    // // set verified email
+    // let updated_user = newuser.set_verified_email().await?;
 
-    assert!(updated_user.email_verified.is_some());
+    // assert!(updated_user.email_verified.is_some());
 
-    println!("{:?}", check_token);
-    assert_eq!(check_token.identifier, newuser.email.to_string());
-    assert!(check_token.expires > Utc::now());
-    assert_eq!(check_token.token.clone(), new_token.token.clone());
+    // println!("{:?}", check_token);
+    // assert_eq!(check_token.identifier, newuser.email.to_string());
+    // assert!(check_token.expires > Utc::now());
+    // assert_eq!(check_token.token.clone(), new_token.token.clone());
 
-    // test session
+    // // test session
 
-    let newsession = newuser.new_session().await?;
-    println!("Created Session: {:?}", newsession);
+    // let newsession = newuser.new_session().await?;
+    // println!("Created Session: {:?}", newsession);
 
-    let session_from_string = AdapterSession::from_string(newsession.session_token.clone()).await?;
+    // let session_from_string = AdapterSession::from_string(newsession.session_token.clone()).await?;
 
-    assert_eq!(session_from_string.session_token, newsession.session_token);
+    // assert_eq!(session_from_string.session_token, newsession.session_token);
 
-    let user_from_session: AdapterUser =
-        AdapterUser::get_user(session_from_string.user_id.clone()).await?;
+    // let user_from_session: AdapterUser =
+    //     AdapterUser::get_user(session_from_string.user_id.clone()).await?;
 
-    assert_eq!(user_from_session.id, newuser.id);
-    assert_eq!(user_from_session.id, updated_user.id);
+    // assert_eq!(user_from_session.id, newuser.id);
+    // assert_eq!(user_from_session.id, updated_user.id);
 
-    // optimization - get user from session directly
+    // // optimization - get user from session directly
 
-    let user_fast = AdapterUser::get_user_from_session(newsession.session_token.clone()).await?;
+    // let user_fast = AdapterUser::get_user_from_session(newsession.session_token.clone()).await?;
 
-    assert_eq!(user_fast.id, newuser.id);
+    // assert_eq!(user_fast.id, newuser.id);
 
     Ok(())
 }

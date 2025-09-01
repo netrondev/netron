@@ -1,3 +1,4 @@
+pub mod p2p;
 use crate::{
     components::{
         button::ButtonIcon,
@@ -14,19 +15,19 @@ use leptos_router::{
     components::{Route, Router, Routes},
     path,
 };
-use phosphor_leptos::{CUBE, CURRENCY_ETH, GEAR, PLANET, WALLET};
+use phosphor_leptos::{CUBE, GEAR, PLANET, SHARE_NETWORK};
 pub mod apperror;
 pub mod auth;
 pub mod chat;
 pub mod colors;
 pub mod components;
 pub mod date_utils;
-pub mod email;
 pub mod navbar;
 pub mod theme;
 pub use apperror::AppError;
 pub mod db;
 pub mod screens;
+
 pub mod surrealtypes;
 #[cfg(feature = "ssr")]
 pub use db::db_init;
@@ -36,6 +37,13 @@ pub use surrealdb::{Datetime, RecordId};
 
 #[cfg(not(feature = "ssr"))]
 pub use crate::surrealtypes::{Datetime, RecordId};
+
+pub const LOGO: &str = "
+ _____ _____ _____ _____ _____ _____ 
+|   | |   __|_   _| __  |     |   | |
+| | | |   __| | | |    -|  |  | | | |
+|_|___|_____| |_| |__|__|_____|_|___|
+";
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -51,6 +59,12 @@ pub fn App() -> impl IntoView {
             icon: ButtonIcon::Icon(PLANET),
             icon_hover: None,
             url: "/global".to_string(),
+        }),
+        SidebarItem::Link(NavBarLink {
+            name: "iroh".to_string(),
+            icon: ButtonIcon::Icon(SHARE_NETWORK),
+            icon_hover: None,
+            url: "/iroh".to_string(),
         }),
         SidebarItem::Gap,
         SidebarItem::Divider,
@@ -90,7 +104,7 @@ pub fn App() -> impl IntoView {
                                          <Routes fallback=|| "Page not found.".into_view()>
                                             <Route path=path!("/") view=HomeScreen />
                                             <Route path=path!("/global") view=ChatScreen />
-
+                                            <Route path=path!("/iroh") view=p2p::iroh_ui::IrohTest />
                                         </Routes>
                                     </div>
                                 </div>

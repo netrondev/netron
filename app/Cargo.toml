@@ -28,7 +28,7 @@ time = { workspace = true, optional = true }
 regex = { workspace = true, optional = true }
 bytes = { workspace = true, optional = true }
 tokio = { workspace = true, optional = true }
-resend-rs = { workspace = true, optional = true }
+
 dotenvy = { workspace = true, optional = true }
 axum = { workspace = true, optional = true }
 axum-extra = { workspace = true, optional = true }
@@ -42,6 +42,12 @@ rand = { workspace = true, optional = true }
 futures-util = { workspace = true, optional = true }
 dashmap = { workspace = true, optional = true }
 
+
+data-encoding = { workspace = true, optional = true }
+futures-lite = { workspace = true, optional = true }
+iroh = { workspace = true, optional = true }
+iroh-gossip = { workspace = true, optional = true }
+anyhow = { workspace = true, optional = true }
 
 [features]
 csr = ["leptos/csr"]
@@ -85,7 +91,6 @@ ssr = [
   "regex",
   "bytes",
   "tokio",
-  "resend-rs",
   "dotenvy",
   "axum",
   "axum-extra",
@@ -98,4 +103,9 @@ ssr = [
   "rand",
   "dashmap",
   "futures-util",
+  "anyhow",
+  "data-encoding",
+  "futures-lite",
+  "iroh",
+  "iroh-gossip",
 ]

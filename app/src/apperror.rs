@@ -341,6 +341,14 @@ impl From<anyhow::Error> for AppError {
     }
 }
 
+#[cfg(feature = "ssr")]
+impl From<iroh_gossip::net::Error> for AppError {
+    fn from(error: iroh_gossip::net::Error) -> Self {
+        tracing::error!(error = %error, "Iroh gossip network error");
+        Self::GenericError(format!("{error}"))
+    }
+}
+
 /// This will help print out the offending part of the JSON that caused the deserialization error.
 ///
 /// ### EXAMPLE:

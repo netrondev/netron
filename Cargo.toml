@@ -128,7 +128,7 @@ lto = true
 [profile.dev]
 lto = false
 opt-level = 0
-debug = 1  # Reduce debug info for faster compilation
+debug = 1     # Reduce debug info for faster compilation
 
 [profile.dev.package."*"]
 opt-level = 2
@@ -142,7 +142,7 @@ codegen-units = 256
 incremental = true
 
 [profile.fast-dev.package."*"]
-opt-level = 1  # Minimal optimization for deps to keep them reasonably fast
+opt-level = 1 # Minimal optimization for deps to keep them reasonably fast
 
 [[workspace.metadata.leptos]]
 # project name

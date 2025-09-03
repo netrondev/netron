@@ -1,5 +1,10 @@
+#[cfg(feature = "ssr")]
 use futures_lite::StreamExt;
+
+#[cfg(feature = "ssr")]
 use iroh::{protocol::Router, Endpoint, NodeAddr, NodeId};
+
+#[cfg(feature = "ssr")]
 use iroh_gossip::{
     net::{Event, Gossip, GossipEvent, GossipReceiver},
     proto::TopicId,
@@ -7,6 +12,40 @@ use iroh_gossip::{
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt, str::FromStr};
 
+use crate::AppError;
+
+#[cfg(feature = "ssr")]
+pub async fn iroh_create(username: String) -> Result<String, AppError> {
+    // parse the cli command
+
+    let topic = TopicId::from_bytes(rand::random());
+    println!("> opening chat room for topic {topic}");
+
+    let endpoint = Endpoint::builder().discovery_n0().bind().await?;
+
+    println!("> our node id: {}", endpoint.node_id());
+    let gossip = Gossip::builder().spawn(endpoint.clone()).await?;
+
+    let _router = Router::builder(endpoint.clone())
+        .accept(iroh_gossip::ALPN, gossip.clone())
+        .spawn();
+
+    // in our main file, after we create a topic `id`:
+    // print a ticket that includes our own node id and endpoint addresses
+    let ticket = {
+        // Get our address information, includes our
+        // `NodeId`, our `RelayUrl`, and any direct
+        // addresses.
+        let me = endpoint.node_addr().await?;
+        let nodes = vec![me];
+        Ticket { topic, nodes }
+    };
+    println!("> ticket to join us: {ticket}");
+
+    Ok(ticket.to_string())
+}
+
+#[cfg(feature = "ssr")]
 pub async fn iroh_connect(
     optional_ticket_string: Option<String>,
     optional_name: Option<String>,
@@ -97,18 +136,21 @@ pub async fn iroh_connect(
     Ok(())
 }
 
+#[cfg(feature = "ssr")]
 #[derive(Debug, Serialize, Deserialize)]
 struct Message {
     body: MessageBody,
     nonce: [u8; 16],
 }
 
+#[cfg(feature = "ssr")]
 #[derive(Debug, Serialize, Deserialize)]
 enum MessageBody {
     AboutMe { from: NodeId, name: String },
     Message { from: NodeId, text: String },
 }
 
+#[cfg(feature = "ssr")]
 impl Message {
     fn from_bytes(bytes: &[u8]) -> anyhow::Result<Self> {
         serde_json::from_slice(bytes).map_err(Into::into)
@@ -127,6 +169,7 @@ impl Message {
 }
 
 // Handle incoming events
+#[cfg(feature = "ssr")]
 async fn subscribe_loop(mut receiver: GossipReceiver) -> anyhow::Result<()> {
     // keep track of the mapping between `NodeId`s and names
     let mut names = HashMap::new();
@@ -159,6 +202,7 @@ async fn subscribe_loop(mut receiver: GossipReceiver) -> anyhow::Result<()> {
     Ok(())
 }
 
+#[cfg(feature = "ssr")]
 fn input_loop(line_tx: tokio::sync::mpsc::Sender<String>) -> anyhow::Result<()> {
     let mut buffer = String::new();
     let stdin = std::io::stdin(); // We get `Stdin` here.
@@ -170,12 +214,14 @@ fn input_loop(line_tx: tokio::sync::mpsc::Sender<String>) -> anyhow::Result<()> 
 }
 
 // add the `Ticket` code to the bottom of the main file
+#[cfg(feature = "ssr")]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Ticket {
     pub topic: TopicId,
     pub nodes: Vec<NodeAddr>,
 }
 
+#[cfg(feature = "ssr")]
 impl Ticket {
     /// Deserialize from a slice of bytes to a Ticket.
     fn from_bytes(bytes: &[u8]) -> anyhow::Result<Self> {
@@ -190,6 +236,7 @@ impl Ticket {
 
 // The `Display` trait allows us to use the `to_string`
 // method on `Ticket`.
+#[cfg(feature = "ssr")]
 impl fmt::Display for Ticket {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut text = data_encoding::BASE32_NOPAD.encode(&self.to_bytes()[..]);
@@ -200,6 +247,7 @@ impl fmt::Display for Ticket {
 
 // The `FromStr` trait allows us to turn a `str` into
 // a `Ticket`
+#[cfg(feature = "ssr")]
 impl FromStr for Ticket {
     type Err = anyhow::Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {

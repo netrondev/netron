@@ -55,3 +55,4 @@ pub mod image_upload;
 pub mod label;
 pub mod page_error_404;
 pub mod progress_bar;
+pub mod qrcode;

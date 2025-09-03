@@ -68,7 +68,9 @@ hydrate = [
   "time",
   "leptos-use",
   "reqwest",
-  "regex",
+  "anyhow",
+  "data-encoding",
+
 ]
 ssr = [
   "leptos/ssr",

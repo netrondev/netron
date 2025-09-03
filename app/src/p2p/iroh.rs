@@ -255,3 +255,13 @@ impl FromStr for Ticket {
         Self::from_bytes(&bytes)
     }
 }
+
+#[cfg(feature = "ssr")]
+#[tokio::test]
+async fn test_iroh() -> Result<(), anyhow::Error> {
+    let ticket = iroh_create("alice".to_string()).await?;
+    println!("ticket: {ticket}");
+    iroh_connect(Some(ticket), Some("bob".to_string())).await?;
+
+    Ok(())
+}

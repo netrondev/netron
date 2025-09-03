@@ -17,7 +17,7 @@ async fn create_ticket_sf(user: String) -> Result<String, ServerFnError> {
 #[component]
 pub fn IrohTest() -> impl IntoView {
     let username = RwSignal::new("unnamed_user".to_string());
-    let ticket = RwSignal::new("No ticket created yet".to_string());
+    let ticket: RwSignal<Option<String>> = RwSignal::new(None);
     let create_ticket = Action::new(move |user: &String| {
         let u = user.clone();
         async move {
@@ -25,9 +25,9 @@ pub fn IrohTest() -> impl IntoView {
 
             match &output {
                 Ok(t) => {
-                    ticket.set(t.clone());
+                    ticket.set(Some(t.clone()));
                 }
-                Err(e) => ticket.set(e.to_string()),
+                Err(e) => ticket.set(None),
             }
 
             output
@@ -61,12 +61,24 @@ pub fn IrohTest() -> impl IntoView {
             </Button>
 
             <div>
-                {move || view! {
-                    <div>
-                        <QRCode input={ticket.get()} />
-                        <div class="w-[300px] overflow-x-scroll">{ticket.get()}</div>
-                    </div>
-                }}
+                {move || {
+
+                    match ticket.get() {
+                        Some(t) =>
+
+                            view! {
+                                <div>
+                                    <QRCode input={t.clone()} />
+                                    <div class="w-[300px] overflow-x-scroll">{t}</div>
+                                </div>
+                            }.into_any(),
+
+
+                        None => view! { <div>"No ticket yet"</div> }.into_any()
+                    }
+
+                }
+                }
             </div>
 
         </div>

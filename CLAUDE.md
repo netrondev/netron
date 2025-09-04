@@ -110,3 +110,4 @@ The project uses a custom Leptos fork (`github.com/rvdende/leptos` branch `css_h
 - Database types that need to work on both client and server use conditional compilation (see `app/src/lib.rs` lines 34-39)
 - Dark mode is handled via TailwindCSS classes with `dark:` prefix
 - Components should support theme transitions with `transition-colors` class
+- the build failed, after code changes double check with "cargo leptos test"

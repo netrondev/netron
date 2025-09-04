@@ -43,12 +43,12 @@ impl ChatNode {
     }
 
     async fn join_inner(&self, ticket: ChatTicket, nickname: String) -> Result<Channel, JsError> {
-        let (sender, _receiver) = self.0.join(&ticket, nickname).await.map_err(to_js_err)?;
+        let (sender, receiver) = self.0.join(&ticket, nickname).await.map_err(to_js_err)?;
         let sender = ChannelSender(sender);
         let neighbors = Arc::new(Mutex::new(BTreeSet::new()));
         
-        // For now, we'll create a simple channel without the complex stream handling
-        // This will be a simplified version that focuses on basic messaging
+        web_sys::console::log_1(&"Successfully created chat channel".into());
+        
         let mut ticket = ticket;
         ticket.bootstrap.insert(self.0.node_id());
 
@@ -58,6 +58,7 @@ impl ChatNode {
             neighbors,
             me: self.0.node_id(),
             sender,
+            _receiver: Some(receiver), // Keep the receiver alive by storing it
         };
         Ok(channel)
     }
@@ -71,6 +72,8 @@ pub struct Channel {
     bootstrap: BTreeSet<NodeId>,
     neighbors: Arc<Mutex<BTreeSet<NodeId>>>,
     sender: ChannelSender,
+    // Keep the receiver alive by storing it  
+    _receiver: Option<n0_future::boxed::BoxStream<Result<crate::p2p::iroh::Event>>>,
 }
 
 #[cfg(feature = "hydrate")]

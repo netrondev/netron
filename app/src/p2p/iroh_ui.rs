@@ -55,6 +55,9 @@ pub fn IrohTest() -> impl IntoView {
     let message_input = RwSignal::new(String::new());
     let status = RwSignal::new("P2P Chat - Click to initialize node".to_string());
     let node_ready = RwSignal::new(false);
+    
+    #[cfg(feature = "hydrate")]
+    let chat_node: RwSignal<Option<crate::p2p::wasm_chat::ChatNode>> = RwSignal::new(None);
 
     let initialize_node = move |_| {
         #[cfg(feature = "hydrate")]
@@ -65,6 +68,7 @@ pub fn IrohTest() -> impl IntoView {
                     Ok(node) => {
                         let node_id = node.node_id();
                         status.set(format!("Node ready! ID: {:.8}...", node_id));
+                        chat_node.set(Some(node));
                         node_ready.set(true);
                     }
                     Err(e) => {
@@ -87,11 +91,11 @@ pub fn IrohTest() -> impl IntoView {
 
         #[cfg(feature = "hydrate")]
         {
-            let username_val = username.get();
-            status.set("Creating chat room...".to_string());
-            wasm_bindgen_futures::spawn_local(async move {
-                match crate::p2p::wasm_chat::ChatNode::spawn().await {
-                    Ok(node) => match node.create(username_val).await {
+            if let Some(node) = chat_node.get() {
+                let username_val = username.get();
+                status.set("Creating chat room...".to_string());
+                wasm_bindgen_futures::spawn_local(async move {
+                    match node.create(username_val).await {
                         Ok(channel) => {
                             let sender = channel.sender();
                             let topic_id = channel.id();
@@ -120,12 +124,11 @@ pub fn IrohTest() -> impl IntoView {
                         Err(e) => {
                             status.set(format!("Failed to create chat: {:?}", e));
                         }
-                    },
-                    Err(e) => {
-                        status.set(format!("Failed to spawn node: {:?}", e));
                     }
-                }
-            });
+                });
+            } else {
+                status.set("Node not initialized yet".to_string());
+            }
         }
         #[cfg(not(feature = "hydrate"))]
         {
@@ -147,11 +150,11 @@ pub fn IrohTest() -> impl IntoView {
 
         #[cfg(feature = "hydrate")]
         {
-            let username_val = username.get();
-            status.set("Joining chat room...".to_string());
-            wasm_bindgen_futures::spawn_local(async move {
-                match crate::p2p::wasm_chat::ChatNode::spawn().await {
-                    Ok(node) => match node.join(ticket_str, username_val.clone()).await {
+            if let Some(node) = chat_node.get() {
+                let username_val = username.get();
+                status.set("Joining chat room...".to_string());
+                wasm_bindgen_futures::spawn_local(async move {
+                    match node.join(ticket_str, username_val.clone()).await {
                         Ok(channel) => {
                             let sender = channel.sender();
                             let topic_id = channel.id();
@@ -174,12 +177,11 @@ pub fn IrohTest() -> impl IntoView {
                         Err(e) => {
                             status.set(format!("Failed to join chat: {:?}", e));
                         }
-                    },
-                    Err(e) => {
-                        status.set(format!("Failed to spawn node: {:?}", e));
                     }
-                }
-            });
+                });
+            } else {
+                status.set("Node not initialized yet".to_string());
+            }
         }
         #[cfg(not(feature = "hydrate"))]
         {
@@ -290,7 +292,8 @@ pub fn IrohTest() -> impl IntoView {
                                         variant=BtnVariant::Default
                                         on:click=move |_| {
                                             active_chat.set(None);
-                                            node_ready.set(false);
+                                            ticket.set(None);
+                                            // Keep the node ready and available for reuse
                                         }
                                     >
                                         "Leave Chat"

@@ -201,8 +201,12 @@ pub fn IrohTest() -> impl IntoView {
                             Ok(mut channel) => {
                                 let sender = channel.sender();
                                 let topic_id = channel.id();
-                                let opts = web_sys::js_sys::Object::new();
-                                let ticket_str = channel.ticket(opts.into()).unwrap();
+                                let opts = serde_wasm_bindgen::to_value(&crate::p2p::wasm_chat::TicketOpts {
+                                    include_myself: true,
+                                    include_bootstrap: true,
+                                    include_neighbors: true,
+                                }).unwrap();
+                                let ticket_str = channel.ticket(opts).unwrap();
 
                                 ticket.set(Some(ticket_str));
 

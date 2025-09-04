@@ -66,12 +66,6 @@ pub fn App() -> impl IntoView {
             icon_hover: None,
             url: "/iroh".to_string(),
         }),
-        SidebarItem::Link(NavBarLink {
-            name: "iroh dual".to_string(),
-            icon: ButtonIcon::Icon(SHARE_NETWORK),
-            icon_hover: None,
-            url: "/iroh-dual".to_string(),
-        }),
         SidebarItem::Gap,
         SidebarItem::Divider,
         SidebarItem::Link(NavBarLink {
@@ -110,7 +104,6 @@ pub fn App() -> impl IntoView {
                                          <Routes fallback=|| "Page not found.".into_view()>
                                             <Route path=path!("/") view=HomeScreen />
                                             <Route path=path!("/iroh") view=p2p::iroh_ui::IrohTest />
-                                            <Route path=path!("/iroh-dual") view=p2p::dual_iroh_test::DualIrohTest />
                                         </Routes>
                                     </div>
                                 </div>

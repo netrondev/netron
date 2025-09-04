@@ -229,9 +229,14 @@ pub async fn create_user_key(
 
     // Generate random bytes for keys - do this before any await
     let (key_private, key_public) = {
-        let mut rng = rand::rng();
-        let private_bytes: [u8; 32] = rng.random();
-        let public_bytes: [u8; 32] = rng.random();
+        // let mut rng = rand::rng(); //0.9.2
+        let mut rng = rand::thread_rng();
+
+        // let private_bytes: [u8; 32] = rng.random();
+        // let public_bytes: [u8; 32] = rng.random();
+
+        let private_bytes: [u8; 32] = rng.gen();
+        let public_bytes: [u8; 32] = rng.gen();
 
         // Encode to base64
         let key_private = general_purpose::STANDARD.encode(&private_bytes);

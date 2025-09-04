@@ -5,7 +5,7 @@ use crate::{
         sidebar::{NavBarLink, SideBar, SidebarItem},
     },
     navbar::Navbar,
-    screens::{ChatScreen, HomeScreen},
+    screens::HomeScreen,
     theme::ThemeProvider,
 };
 use backend::*;
@@ -103,7 +103,6 @@ pub fn App() -> impl IntoView {
 
                                          <Routes fallback=|| "Page not found.".into_view()>
                                             <Route path=path!("/") view=HomeScreen />
-                                            <Route path=path!("/global") view=ChatScreen />
                                             <Route path=path!("/iroh") view=p2p::iroh_ui::IrohTest />
                                         </Routes>
                                     </div>

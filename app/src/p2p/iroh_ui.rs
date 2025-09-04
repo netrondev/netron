@@ -1,38 +1,20 @@
 use leptos::prelude::*;
 use phosphor_leptos::ARROW_RIGHT;
 
-use crate::components::{
-    button::{BtnVariant, ButtonIcon},
-    label::Label,
-    qrcode::QRCode,
-    Button, Input,
+use crate::{
+    components::{
+        button::{BtnVariant, ButtonIcon},
+        label::Label,
+        qrcode::QRCode,
+        Button, Input,
+    },
+    p2p::iroh::ChatTicket,
 };
-
-#[server]
-async fn create_ticket_sf(user: String) -> Result<String, ServerFnError> {
-    let result = crate::p2p::iroh::iroh_create(user).await?;
-    Ok(result)
-}
 
 #[component]
 pub fn IrohTest() -> impl IntoView {
     let username = RwSignal::new("unnamed_user".to_string());
     let ticket: RwSignal<Option<String>> = RwSignal::new(None);
-    let create_ticket = Action::new(move |user: &String| {
-        let u = user.clone();
-        async move {
-            let output = create_ticket_sf(u).await;
-
-            match &output {
-                Ok(t) => {
-                    ticket.set(Some(t.clone()));
-                }
-                Err(e) => ticket.set(None),
-            }
-
-            output
-        }
-    });
 
     // Your component implementation here
     view! {
@@ -53,8 +35,9 @@ pub fn IrohTest() -> impl IntoView {
                 icon=ButtonIcon::Icon(ARROW_RIGHT)
                 variant=BtnVariant::Default
                 on:click=move |_| {
-                    let user = username.get();
-                    create_ticket.dispatch(user);
+                    let ticketcreated = ChatTicket::new_random();
+                    let output = ticketcreated.serialize();
+                    ticket.set(Some(output.clone()));
                 }
             >
                 "Create Ticket"

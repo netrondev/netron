@@ -15,8 +15,13 @@ CARGO_PROFILE_DEV_DEBUG = "1"
 # Windows:
 # rustflags = ["-C", "link-arg=-fuse-ld=lld-link"]
 
+# RUSTFLAGS = '--cfg getrandom_backend="wasm_js"'
+
 # Faster incremental compilation
 incremental = true
+
+[target.wasm32-unknown-unknown]
+rustflags = ['--cfg', 'getrandom_backend="wasm_js"']
 
 # Use the fast-dev profile for tauri dev command
 [alias]

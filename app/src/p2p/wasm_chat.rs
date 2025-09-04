@@ -1,10 +1,13 @@
 #[cfg(feature = "hydrate")]
-use std::{collections::BTreeSet, sync::{Arc, Mutex}};
+use std::{
+    collections::BTreeSet,
+    sync::{Arc, Mutex},
+};
 
 #[cfg(feature = "hydrate")]
-use anyhow::Result;
-#[cfg(feature = "hydrate")]
 use crate::p2p::iroh::{ChatTicket, NodeId, TopicId};
+#[cfg(feature = "hydrate")]
+use anyhow::Result;
 #[cfg(feature = "hydrate")]
 use n0_future::StreamExt;
 #[cfg(feature = "hydrate")]
@@ -48,9 +51,9 @@ impl ChatNode {
         let sender = ChannelSender(sender);
         let neighbors = Arc::new(Mutex::new(BTreeSet::new()));
         let neighbors2 = neighbors.clone();
-        
+
         web_sys::console::log_1(&"Successfully created chat channel".into());
-        
+
         // Map receiver to handle neighbor tracking and convert to JS values
         let receiver = receiver.map(move |event| {
             if let Ok(event) = &event {
@@ -72,7 +75,7 @@ impl ChatNode {
                 .map(|event| serde_wasm_bindgen::to_value(&event).unwrap())
         });
         let receiver = ReadableStream::from_stream(receiver).into_raw();
-        
+
         let mut ticket = ticket;
         ticket.bootstrap.insert(self.0.node_id());
 

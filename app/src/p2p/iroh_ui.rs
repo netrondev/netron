@@ -39,13 +39,15 @@ fn start_receiver_consumer(
         // Convert the sys ReadableStream to the wasm_streams ReadableStream
         let mut readable_stream = ReadableStream::from_raw(stream);
         let mut reader = readable_stream.get_reader();
-        
+
         loop {
             // Read from the stream
             match reader.read().await {
                 Ok(Some(chunk)) => {
                     // Parse the event from the JS value
-                    if let Ok(event) = serde_wasm_bindgen::from_value::<crate::p2p::iroh::Event>(chunk) {
+                    if let Ok(event) =
+                        serde_wasm_bindgen::from_value::<crate::p2p::iroh::Event>(chunk)
+                    {
                         handle_received_event(event, active_chat);
                     }
                 }
@@ -63,13 +65,23 @@ fn start_receiver_consumer(
 }
 
 #[cfg(feature = "hydrate")]
-fn handle_received_event(event: crate::p2p::iroh::Event, active_chat: RwSignal<Option<ActiveChat>>) {
+fn handle_received_event(
+    event: crate::p2p::iroh::Event,
+    active_chat: RwSignal<Option<ActiveChat>>,
+) {
     use crate::p2p::iroh::Event;
-    
+
     match event {
-        Event::MessageReceived { from, text, nickname, sent_timestamp } => {
-            web_sys::console::log_1(&format!("Received message from {}: {}", nickname, text).into());
-            
+        Event::MessageReceived {
+            from,
+            text,
+            nickname,
+            sent_timestamp,
+        } => {
+            web_sys::console::log_1(
+                &format!("Received message from {}: {}", nickname, text).into(),
+            );
+
             let new_message = ChatMessage {
                 from: from.to_string(),
                 nickname,
@@ -77,7 +89,7 @@ fn handle_received_event(event: crate::p2p::iroh::Event, active_chat: RwSignal<O
                 timestamp: sent_timestamp,
                 is_own: false,
             };
-            
+
             // Add the message to the active chat
             active_chat.update(|chat_opt| {
                 if let Some(ref mut chat) = chat_opt {
@@ -85,9 +97,13 @@ fn handle_received_event(event: crate::p2p::iroh::Event, active_chat: RwSignal<O
                 }
             });
         }
-        Event::Presence { from, nickname, sent_timestamp: _ } => {
+        Event::Presence {
+            from,
+            nickname,
+            sent_timestamp: _,
+        } => {
             web_sys::console::log_1(&format!("Presence update: {} is online", nickname).into());
-            
+
             // Update online users
             active_chat.update(|chat_opt| {
                 if let Some(ref mut chat) = chat_opt {
@@ -96,7 +112,9 @@ fn handle_received_event(event: crate::p2p::iroh::Event, active_chat: RwSignal<O
             });
         }
         Event::Joined { neighbors } => {
-            web_sys::console::log_1(&format!("Joined gossip network with {} neighbors", neighbors.len()).into());
+            web_sys::console::log_1(
+                &format!("Joined gossip network with {} neighbors", neighbors.len()).into(),
+            );
         }
         Event::NeighborUp { node_id } => {
             web_sys::console::log_1(&format!("Neighbor connected: {}", node_id).into());
@@ -137,7 +155,7 @@ pub fn IrohTest() -> impl IntoView {
     let message_input = RwSignal::new(String::new());
     let status = RwSignal::new("P2P Chat - Click to initialize node".to_string());
     let node_ready = RwSignal::new(false);
-    
+
     #[cfg(feature = "hydrate")]
     let chat_node: RwSignal<Option<crate::p2p::wasm_chat::ChatNode>> = RwSignal::new(None);
 
@@ -203,11 +221,9 @@ pub fn IrohTest() -> impl IntoView {
                                     sender: Some(sender),
                                 };
                                 active_chat.set(Some(chat));
-                                
                                 // Start consuming the receiver stream
                                 let receiver = channel.receiver();
                                 start_receiver_consumer(receiver, active_chat);
-                                
                                 status.set("Chat room created successfully!".to_string());
                             }
                             Err(e) => {
@@ -255,7 +271,10 @@ pub fn IrohTest() -> impl IntoView {
                                     messages: vec![ChatMessage {
                                         from: "system".to_string(),
                                         nickname: "System".to_string(),
-                                        text: format!("Joined chat room! Welcome, {}.", username_val),
+                                        text: format!(
+                                            "Joined chat room! Welcome, {}.",
+                                            username_val
+                                        ),
                                         timestamp: current_timestamp(),
                                         is_own: false,
                                     }],
@@ -264,11 +283,11 @@ pub fn IrohTest() -> impl IntoView {
                                     sender: Some(sender),
                                 };
                                 active_chat.set(Some(chat));
-                                
+
                                 // Start consuming the receiver stream
                                 let receiver = channel.receiver();
                                 start_receiver_consumer(receiver, active_chat);
-                                
+
                                 status.set("Successfully joined chat room!".to_string());
                             }
                             Err(e) => {

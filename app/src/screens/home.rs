@@ -6,7 +6,7 @@ pub fn HomeScreen() -> impl IntoView {
         <div class="screen home-screen">
             <h1>"Welcome to Netron"</h1>
             <p>"A decentralized communication platform"</p>
-            
+
             <div class="features">
                 <div class="feature-card">
                     <h3>"Secure Messaging"</h3>

@@ -73,6 +73,7 @@ impl Ticket for ChatTicket {
     }
 }
 
+#[derive(Clone)]
 pub struct ChatNode {
     secret_key: SecretKey,
     router: Router,

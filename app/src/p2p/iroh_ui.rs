@@ -91,44 +91,47 @@ pub fn IrohTest() -> impl IntoView {
 
         #[cfg(feature = "hydrate")]
         {
-            if let Some(node) = chat_node.get() {
-                let username_val = username.get();
-                status.set("Creating chat room...".to_string());
-                wasm_bindgen_futures::spawn_local(async move {
-                    match node.create(username_val).await {
-                        Ok(channel) => {
-                            let sender = channel.sender();
-                            let topic_id = channel.id();
-                            let opts = web_sys::js_sys::Object::new();
-                            let ticket_str = channel.ticket(opts.into()).unwrap();
+            chat_node.with(|node_opt| {
+                if let Some(node) = node_opt {
+                    let username_val = username.get();
+                    let node_clone = node.clone();
+                    status.set("Creating chat room...".to_string());
+                    wasm_bindgen_futures::spawn_local(async move {
+                        match node_clone.create(username_val).await {
+                            Ok(channel) => {
+                                let sender = channel.sender();
+                                let topic_id = channel.id();
+                                let opts = web_sys::js_sys::Object::new();
+                                let ticket_str = channel.ticket(opts.into()).unwrap();
 
-                            ticket.set(Some(ticket_str));
+                                ticket.set(Some(ticket_str));
 
-                            let chat = ActiveChat {
-                                messages: vec![ChatMessage {
-                                    from: "system".to_string(),
-                                    nickname: "System".to_string(),
-                                    text:
-                                        "Chat room created! Others can now join using the ticket."
-                                            .to_string(),
-                                    timestamp: current_timestamp(),
-                                    is_own: false,
-                                }],
-                                online_users: HashMap::new(),
-                                topic_id: format!("{:.8}", topic_id),
-                                sender: Some(sender),
-                            };
-                            active_chat.set(Some(chat));
-                            status.set("Chat room created successfully!".to_string());
+                                let chat = ActiveChat {
+                                    messages: vec![ChatMessage {
+                                        from: "system".to_string(),
+                                        nickname: "System".to_string(),
+                                        text:
+                                            "Chat room created! Others can now join using the ticket."
+                                                .to_string(),
+                                        timestamp: current_timestamp(),
+                                        is_own: false,
+                                    }],
+                                    online_users: HashMap::new(),
+                                    topic_id: format!("{:.8}", topic_id),
+                                    sender: Some(sender),
+                                };
+                                active_chat.set(Some(chat));
+                                status.set("Chat room created successfully!".to_string());
+                            }
+                            Err(e) => {
+                                status.set(format!("Failed to create chat: {:?}", e));
+                            }
                         }
-                        Err(e) => {
-                            status.set(format!("Failed to create chat: {:?}", e));
-                        }
-                    }
-                });
-            } else {
-                status.set("Node not initialized yet".to_string());
-            }
+                    });
+                } else {
+                    status.set("Node not initialized yet".to_string());
+                }
+            });
         }
         #[cfg(not(feature = "hydrate"))]
         {
@@ -150,38 +153,41 @@ pub fn IrohTest() -> impl IntoView {
 
         #[cfg(feature = "hydrate")]
         {
-            if let Some(node) = chat_node.get() {
-                let username_val = username.get();
-                status.set("Joining chat room...".to_string());
-                wasm_bindgen_futures::spawn_local(async move {
-                    match node.join(ticket_str, username_val.clone()).await {
-                        Ok(channel) => {
-                            let sender = channel.sender();
-                            let topic_id = channel.id();
+            chat_node.with(|node_opt| {
+                if let Some(node) = node_opt {
+                    let username_val = username.get();
+                    let node_clone = node.clone();
+                    status.set("Joining chat room...".to_string());
+                    wasm_bindgen_futures::spawn_local(async move {
+                        match node_clone.join(ticket_str, username_val.clone()).await {
+                            Ok(channel) => {
+                                let sender = channel.sender();
+                                let topic_id = channel.id();
 
-                            let chat = ActiveChat {
-                                messages: vec![ChatMessage {
-                                    from: "system".to_string(),
-                                    nickname: "System".to_string(),
-                                    text: format!("Joined chat room! Welcome, {}.", username_val),
-                                    timestamp: current_timestamp(),
-                                    is_own: false,
-                                }],
-                                online_users: HashMap::new(),
-                                topic_id: format!("{:.8}", topic_id),
-                                sender: Some(sender),
-                            };
-                            active_chat.set(Some(chat));
-                            status.set("Successfully joined chat room!".to_string());
+                                let chat = ActiveChat {
+                                    messages: vec![ChatMessage {
+                                        from: "system".to_string(),
+                                        nickname: "System".to_string(),
+                                        text: format!("Joined chat room! Welcome, {}.", username_val),
+                                        timestamp: current_timestamp(),
+                                        is_own: false,
+                                    }],
+                                    online_users: HashMap::new(),
+                                    topic_id: format!("{:.8}", topic_id),
+                                    sender: Some(sender),
+                                };
+                                active_chat.set(Some(chat));
+                                status.set("Successfully joined chat room!".to_string());
+                            }
+                            Err(e) => {
+                                status.set(format!("Failed to join chat: {:?}", e));
+                            }
                         }
-                        Err(e) => {
-                            status.set(format!("Failed to join chat: {:?}", e));
-                        }
-                    }
-                });
-            } else {
-                status.set("Node not initialized yet".to_string());
-            }
+                    });
+                } else {
+                    status.set("Node not initialized yet".to_string());
+                }
+            });
         }
         #[cfg(not(feature = "hydrate"))]
         {

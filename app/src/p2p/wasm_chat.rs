@@ -16,6 +16,7 @@ use wasm_bindgen::{prelude::wasm_bindgen, JsError, JsValue};
 
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen]
+#[derive(Clone)]
 pub struct ChatNode(crate::p2p::iroh::ChatNode);
 
 #[cfg(feature = "hydrate")]

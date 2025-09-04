@@ -54,6 +54,8 @@ n0-future = { workspace = true, optional = true }
 postcard = { workspace = true, optional = true }
 getrandom = { workspace = true, optional = true }
 wasm-bindgen-futures = { workspace = true, optional = true }
+wasm-streams = { workspace = true, optional = true }
+serde-wasm-bindgen = { workspace = true, optional = true }
 
 [features]
 csr = ["leptos/csr"]
@@ -86,6 +88,8 @@ hydrate = [
   "tracing",
   "getrandom",
   "wasm-bindgen-futures",
+  "wasm-streams",
+  "serde-wasm-bindgen",
 ]
 ssr = [
   "leptos/ssr",

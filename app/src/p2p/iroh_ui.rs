@@ -28,6 +28,88 @@ use crate::{
     p2p::iroh::ChatTicket,
 };
 
+#[cfg(feature = "hydrate")]
+fn start_receiver_consumer(
+    stream: wasm_streams::readable::sys::ReadableStream,
+    active_chat: RwSignal<Option<ActiveChat>>,
+) {
+    use wasm_streams::ReadableStream;
+
+    wasm_bindgen_futures::spawn_local(async move {
+        // Convert the sys ReadableStream to the wasm_streams ReadableStream
+        let mut readable_stream = ReadableStream::from_raw(stream);
+        let mut reader = readable_stream.get_reader();
+        
+        loop {
+            // Read from the stream
+            match reader.read().await {
+                Ok(Some(chunk)) => {
+                    // Parse the event from the JS value
+                    if let Ok(event) = serde_wasm_bindgen::from_value::<crate::p2p::iroh::Event>(chunk) {
+                        handle_received_event(event, active_chat);
+                    }
+                }
+                Ok(None) => {
+                    web_sys::console::log_1(&"Stream ended".into());
+                    break;
+                }
+                Err(e) => {
+                    web_sys::console::error_1(&format!("Stream error: {:?}", e).into());
+                    break;
+                }
+            }
+        }
+    });
+}
+
+#[cfg(feature = "hydrate")]
+fn handle_received_event(event: crate::p2p::iroh::Event, active_chat: RwSignal<Option<ActiveChat>>) {
+    use crate::p2p::iroh::Event;
+    
+    match event {
+        Event::MessageReceived { from, text, nickname, sent_timestamp } => {
+            web_sys::console::log_1(&format!("Received message from {}: {}", nickname, text).into());
+            
+            let new_message = ChatMessage {
+                from: from.to_string(),
+                nickname,
+                text,
+                timestamp: sent_timestamp,
+                is_own: false,
+            };
+            
+            // Add the message to the active chat
+            active_chat.update(|chat_opt| {
+                if let Some(ref mut chat) = chat_opt {
+                    chat.messages.push(new_message);
+                }
+            });
+        }
+        Event::Presence { from, nickname, sent_timestamp: _ } => {
+            web_sys::console::log_1(&format!("Presence update: {} is online", nickname).into());
+            
+            // Update online users
+            active_chat.update(|chat_opt| {
+                if let Some(ref mut chat) = chat_opt {
+                    chat.online_users.insert(from.to_string(), nickname);
+                }
+            });
+        }
+        Event::Joined { neighbors } => {
+            web_sys::console::log_1(&format!("Joined gossip network with {} neighbors", neighbors.len()).into());
+        }
+        Event::NeighborUp { node_id } => {
+            web_sys::console::log_1(&format!("Neighbor connected: {}", node_id).into());
+        }
+        Event::NeighborDown { node_id } => {
+            web_sys::console::log_1(&format!("Neighbor disconnected: {}", node_id).into());
+        }
+        Event::Lagged => {
+            web_sys::console::warn_1(&"Stream lagged - some messages may have been missed".into());
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct ChatMessage {
     from: String,
@@ -98,7 +180,7 @@ pub fn IrohTest() -> impl IntoView {
                     status.set("Creating chat room...".to_string());
                     wasm_bindgen_futures::spawn_local(async move {
                         match node_clone.create(username_val).await {
-                            Ok(channel) => {
+                            Ok(mut channel) => {
                                 let sender = channel.sender();
                                 let topic_id = channel.id();
                                 let opts = web_sys::js_sys::Object::new();
@@ -121,6 +203,11 @@ pub fn IrohTest() -> impl IntoView {
                                     sender: Some(sender),
                                 };
                                 active_chat.set(Some(chat));
+                                
+                                // Start consuming the receiver stream
+                                let receiver = channel.receiver();
+                                start_receiver_consumer(receiver, active_chat);
+                                
                                 status.set("Chat room created successfully!".to_string());
                             }
                             Err(e) => {
@@ -160,7 +247,7 @@ pub fn IrohTest() -> impl IntoView {
                     status.set("Joining chat room...".to_string());
                     wasm_bindgen_futures::spawn_local(async move {
                         match node_clone.join(ticket_str, username_val.clone()).await {
-                            Ok(channel) => {
+                            Ok(mut channel) => {
                                 let sender = channel.sender();
                                 let topic_id = channel.id();
 
@@ -177,6 +264,11 @@ pub fn IrohTest() -> impl IntoView {
                                     sender: Some(sender),
                                 };
                                 active_chat.set(Some(chat));
+                                
+                                // Start consuming the receiver stream
+                                let receiver = channel.receiver();
+                                start_receiver_consumer(receiver, active_chat);
+                                
                                 status.set("Successfully joined chat room!".to_string());
                             }
                             Err(e) => {
